@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  companyID Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  companyName String
+  adress String
+
+  primaryOwnerID Int 
+  primaryOwner User @relation(fields: [primaryOwnerID], references: [userID])
+
+  appointment Appointment[]
+  userCompany User_Company[]
+}
+
+model User_Company {
+  userCompanyID Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userID Int
+  user User @relation(fields: [userID], references: [userID])
+
+  admin Boolean @default(false)
+
+  companyID Int
+  company Company @relation(fields: [companyID], references: [companyID])
+}
+
+model User {
+  userID Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  firstName String
+  lastName String
+  email String?
+  password String?
+
+  identificationCode String?
+
+  company Company[]
+  userCompany User_Company[]
+  token Token[]
+  appointmentCreator Appointment[] @relation("fk_creatorID")
+  appointmentUser Appointment[] @relation("fk_userID")
+}
+
+model Appointment {
+  appointmentID Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  startTime DateTime
+  endTime DateTime?
+
+  clockOutTime DateTime?
+
+  title String?
+  description String?
+
+  handOverRequest Boolean
+
+  creatorID Int
+  Creator User @relation("fk_creatorID", fields: [creatorID], references: [userID])
+
+  userID Int?
+  user User? @relation("fk_userID",fields: [userID], references: [userID])
+
+  companyID Int
+  Company Company @relation(fields: [companyID], references: [companyID])
+}
+
+model Token {
+  refreshToken String @id 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userID Int
+  user User @relation(fields: [userID], references: [userID])
+
+}

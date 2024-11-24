@@ -21,6 +21,8 @@ model Company {
   companyName String
   adress String
 
+  identificationCode String @unique @default("")
+
   primaryOwnerID Int 
   primaryOwner User @relation(fields: [primaryOwnerID], references: [userID])
 

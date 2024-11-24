@@ -12,12 +12,13 @@ export class AuthGuardGuard implements CanActivate {
     const authorizationHeader =
       req['headers']['authorization'] || req['headers']['Authorization'];
 
+    console.log(authorizationHeader);
     if (!authorizationHeader) return false;
 
     const accessToken = authorizationHeader.split(' ')[1];
 
     const user = jwt.verify(accessToken, process.env.JWT_SECRET_PKEY);
-
+    console.log(user);
     if (!user.userID) return false;
 
     req.body.userID = user.userID;

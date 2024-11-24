@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import createCompanyDto from './dto/create-company.dto';
 import createGuestDto from './dto/create-guest.dto';
+import randomString from 'src/functions/randomString';
 
 @Injectable()
 export class CompanyService {
@@ -14,15 +15,36 @@ export class CompanyService {
       },
     });
 
+    const identificationCode =
+      `${randomString(4)}-${randomString(4)}-${randomString(4)}-${randomString(4)}`.toUpperCase();
+
     const company = await this.prisma.company.create({
       data: {
         companyName: dto.companyName,
         adress: dto.adress,
         primaryOwnerID: owner.userID,
+        identificationCode: identificationCode,
       },
     });
 
-    return company;
+    const userCompany = await this.prisma.user_Company.create({
+      data: {
+        userID: owner.userID,
+        companyID: company.companyID,
+      },
+    });
+
+    const _userCompany = await this.prisma.user_Company.findFirst({
+      where: {
+        companyID: userCompany.companyID,
+        userID: userCompany.userID,
+      },
+      include: {
+        company: true,
+      },
+    });
+
+    return _userCompany;
   }
 
   async createGuest(dto: createGuestDto) {
@@ -71,5 +93,20 @@ export class CompanyService {
     });
 
     return user;
+  }
+
+  async getAllJoined(dto: { userID: number }) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        userID: dto.userID,
+      },
+      include: {
+        userCompany: {
+          include: { company: true },
+        },
+      },
+    });
+
+    return { companies: user.userCompany };
   }
 }

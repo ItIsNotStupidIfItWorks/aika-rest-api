@@ -1,11 +1,11 @@
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export default class joinCompanyDto {
   @IsNotEmpty()
   @IsNumber()
-  companyID: number;
+  userID: number;
 
   @IsNotEmpty()
-  @IsNumber()
-  userID: number;
+  @IsString()
+  companyIdentifier: string;
 }

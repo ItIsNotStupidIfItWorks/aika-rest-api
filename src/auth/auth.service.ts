@@ -54,13 +54,13 @@ export class AuthService {
     delete user.password;
 
     const accessToken = jwt.sign(
-      { email: user.email },
+      { userID: user.userID },
       process.env.JWT_SECRET_PKEY,
       { expiresIn: '1d' },
     );
 
     const refreshToken = jwt.sign(
-      { email: user.email },
+      { userID: user.userID },
       process.env.JWT_SECRET_PKEY_REFRESH,
       { expiresIn: '28d' },
     );
@@ -114,12 +114,12 @@ export class AuthService {
     if (!refreshToken) throw new UnauthorizedException();
 
     const accessToken = jwt.sign(
-      { email: user.email },
+      { userID: user.userID },
       process.env.JWT_SECRET_PKEY,
       { expiresIn: '1d' },
     );
     const _refreshToken = jwt.sign(
-      { email: user.email },
+      { userID: user.userID },
       process.env.JWT_SECRET_PKEY_REFRESH,
       { expiresIn: '14d' },
     );

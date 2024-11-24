@@ -23,8 +23,8 @@ export class UserService {
       },
     });
 
-    const company = await this.prisma.company.findUnique({
-      where: { companyID: dto.companyID },
+    const company = await this.prisma.company.findFirst({
+      where: { identificationCode: dto.companyIdentifier.toUpperCase() },
     });
 
     if (!user || !company) throw new BadRequestException('Ungültige Anfrage');
